@@ -70,3 +70,32 @@ async def upload_file(file: UploadFile, expiration_minutes: int = Form(...)):
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка загрузки файла: {str(e)}")
+    
+@router.delete("/delete/{file_id}/{dell_id}")
+async def delete_file(file_id: str, dell_id: str):
+    redis_key = f"file:{file_id}"
+    file_info = redis_client.hgetall(redis_key)
+
+    if not file_info:
+        raise HTTPException(status_code=404, detail="Файл не найден")
+
+    dell_id_redis = file_info.get(b"dell_id").decode()
+    if dell_id_redis != dell_id:
+        raise HTTPException(status_code=403, detail="Не совпадает айди удаления с айди удаления файла")
+
+    file_path = file_info.get(b"file_path").decode()
+
+    # Удаление файла и очистка записи в Redis
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            logger.info(f"Файл {file_path} успешно удален!")
+        else:
+            logger.warning(f"Файл {file_path} не найден.")
+
+        redis_client.delete(redis_key)
+        return {"message": "Файл успешно удален и запись в Redis очищена!"}
+
+    except OSError as e:
+        logger.error(f"Error deleting file {file_path}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Ошибка удаления файла: {str(e)}")
