@@ -15,8 +15,9 @@ class Settings(BaseSettings):
     REDIS_HOST: str               # Хост Redis-сервера
     ACCESS_KEY: str               # s3
     SECRET_KEY: str               # s3     
+    AWS_BUCKET_NAME:str
     BASE_DIR: str = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # Корневая директория проекта
-    UPLOAD_DIR: str = os.path.join(BASE_DIR, 'app/uploads')
+    # UPLOAD_DIR: str = os.path.join(BASE_DIR, 'app/uploads')
     # Указание файла с переменными окружения
     model_config = SettingsConfigDict(env_file=f"{BASE_DIR}/.env")
 

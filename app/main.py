@@ -15,4 +15,4 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(router)
-app.mount("/files", StaticFiles(directory=settings.UPLOAD_DIR), name="files")
+# app.mount("/files", StaticFiles(directory=settings.UPLOAD_DIR), name="files")
