@@ -5,9 +5,9 @@ services:
     command: uvicorn app.main:app --proxy-headers --host 0.0.0.0 --port 8000
     volumes:
       - .:/code
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    # environment:
+    #   - CELERY_BROKER_URL=redis://redis:6379/0
+    #   - CELERY_RESULT_BACKEND=redis://redis:6379/0
     ports:
       - 8000:8000
   worker:
@@ -15,9 +15,9 @@ services:
     command: celery -A app.config worker --loglevel=info
     volumes:
       - .:/code
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    # environment:
+    #   - CELERY_BROKER_URL=redis://redis:6379/0
+    #   - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - redis
   redis:
@@ -31,8 +31,8 @@ services:
       - 5555:5555
     volumes:
       - .:/code
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    # environment:
+    #   - CELERY_BROKER_URL=redis://redis:6379/0
+    #   - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - redis
