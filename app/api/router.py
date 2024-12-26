@@ -3,7 +3,9 @@ import datetime
 from fastapi import APIRouter, UploadFile, HTTPException, Form
 from loguru import logger
 from app.api.utils import generate_random_string
-from app.config import settings, celery_app, redis_client
+from app.config import settings, celery_app, redis_client, s3_client
+
+
 
 router = APIRouter(prefix='/api', tags=['API'])
 
@@ -99,3 +101,29 @@ async def delete_file(file_id: str, dell_id: str):
     except OSError as e:
         logger.error(f"Error deleting file {file_path}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Ошибка удаления файла: {str(e)}")
+    
+@router.post("/upload/s3")
+async def upload_s3(file: UploadFile):
+    try:
+        # Прочитать загруженный файл
+        file_content = await file.read()
+        
+    
+        start_file_name = file.filename
+        # Сгенерировать уникальное имя файла и ID для удаления
+        file_extension:str = os.path.splitext(file.filename)[1]
+        file_id = generate_random_string(12)
+         
+        
+        response = s3_client.put_object(Body=file_content, Bucket='esmeralda', Key=file_id + file_extension)
+        
+        """
+            добавить запись в postgres или redis
+        
+        """
+        
+        
+        return {"response": response}
+        
+    except HTTPException as e:
+        raise e

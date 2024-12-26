@@ -1,6 +1,7 @@
 import os
 import ssl
 
+import boto3
 from celery import Celery
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import redis
@@ -12,6 +13,8 @@ class Settings(BaseSettings):
     REDIS_PORT: int               # Порт для подключения к Redis       # Пароль для подключения к Redis
     BASE_URL: str                 # Базовый URL приложения
     REDIS_HOST: str               # Хост Redis-сервера
+    ACCESS_KEY: str               # s3
+    SECRET_KEY: str               # s3     
     BASE_DIR: str = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # Корневая директория проекта
     UPLOAD_DIR: str = os.path.join(BASE_DIR, 'app/uploads')
     # Указание файла с переменными окружения
@@ -63,3 +66,13 @@ def delete_file_scheduled(self, file_id, dell_id):
         self.retry(exc=exc)
     except Exception as e:
         return None
+    
+    
+    
+    
+s3_client = boto3.client(
+    's3',
+    endpoint_url='https://storage.yandexcloud.net',
+    aws_access_key_id=settings.ACCESS_KEY,
+    aws_secret_access_key=settings.SECRET_KEY,
+)
