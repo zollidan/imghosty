@@ -3,8 +3,10 @@ import datetime
 from fastapi import APIRouter, Response, UploadFile, HTTPException, Form
 from fastapi.responses import FileResponse
 from loguru import logger
+from app.api.router_dao import UserDAO
 from app.api.utils import generate_random_string
-from app.config import settings, celery_app, redis_client, s3_client
+from app.config import settings, s3_client
+from app.schemas import UserSchema
 
 
 
@@ -54,4 +56,33 @@ async def get_file_by_id(file_id:str):
         content=file_binary,
         media_type=content_type
     )
+    
+    
+@router.get("/users")
+async def get_all_users():
+    return await UserDAO.find_all()
+
+
+@router.get("/users/{user_id}")
+async def get_user_by_id(user_id: int) -> UserSchema | None:
+    return await UserDAO.find_one_or_none_by_id(user_id)
+
+@router.post("/users/add/")
+async def register_user(user: UserSchema) -> dict:
+    check = await UserDAO.add(**user.model_dump())
+    if check:
+        return {"message": "User added.", "user": user}
+    else:
+        return {"message": "User add error!"}
+
+"""сделать тут надо put """
+
+@router.delete("/delete/{user_id}")
+async def delete_major(user_id: int) -> dict:
+    check = await UserDAO.delete(id=user_id)
+    if check:
+        return {"message": f"User with ID {user_id} deleted!"}
+    else:
+        return {"message": "Error deleting user!"}
+
     

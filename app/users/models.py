@@ -9,13 +9,9 @@ class User(Base):
     first_name: Mapped[str]
     last_name: Mapped[str]
     password: Mapped[str] = mapped_column(Text, nullable=False)
-    # post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), nullable=False)
-
-    # post: Mapped["Post"] = relationship("Post", back_populates="users")
     
     
 class Post(Base):
     id: Mapped[int_pk]
     name: Mapped[str] = mapped_column(Text, nullable=False)
     url: Mapped[str] = mapped_column(Text, nullable=False)
-    
